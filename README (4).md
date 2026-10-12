@@ -80,7 +80,7 @@ The AWS Automated Cost Optimizer uses scheduled serverless automation to identif
 
 This screenshot shows the `AutoStopEC2` Lambda execution logs and stop requests for eligible EC2 instances based on low CPU utilization.
 
-![AutoStopEC2 CloudWatch Logs](autostop-ec2-logs.png)
+![AutoStopEC2 CloudWatch Logs](autostop-ec2-logs.png/Screenshot%202026-10-12%20223235.png)
 
 ## Author
 Created by: Bhimashankar Ram Dhumal
