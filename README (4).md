@@ -78,5 +78,7 @@ The AWS Automated Cost Optimizer uses scheduled serverless automation to identif
 - Actual behavior depends on the deployed code, IAM permissions, and AWS configuration.
 
 ## Author
+Created by: Bhimashankar Ram Dhumal
 
-Created as a learning project to explore AWS serverless application development and EC2 cost optimization.
+AWS Automated Cost Optimizer — a learning project focused on AWS serverless application development and EC2 cost optimization.
+
