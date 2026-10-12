@@ -77,7 +77,31 @@ The AWS Automated Cost Optimizer uses scheduled serverless automation to identif
 - Confirm the CPU metric lookback window, period, and datapoint requirements in the actual Lambda code.
 - Actual behavior depends on the deployed code, IAM permissions, and AWS configuration.
 - ## CloudWatch Lambda Execution Logs
+## 📸 Project Screenshots
 
+### 1. Screenshot 1
+![Screenshot 1](autostop-ec2-logs.png/Screenshot%202026-10-12%20223235.png)
+
+### 2. Screenshot 2
+![Screenshot 2](autostop-ec2-logs.png/Screenshot%202026-10-12%20223420.png)
+
+### 3. Screenshot 3
+![Screenshot 3](autostop-ec2-logs.png/Screenshot%202026-10-12%20223453.png)
+
+### 4. Screenshot 4
+![Screenshot 4](autostop-ec2-logs.png/Screenshot%202026-10-12%20223646.png)
+
+### 5. Screenshot 5
+![Screenshot 5](autostop-ec2-logs.png/Screenshot%202026-10-12%20223732.png)
+
+### 6. Screenshot 6
+![Screenshot 6](autostop-ec2-logs.png/Screenshot%202026-10-12%20224611.png)
+
+### 7. Screenshot 7
+![Screenshot 7](autostop-ec2-logs.png/Screenshot%202026-10-12%20225242.png)
+
+### 8. Screenshot 8
+![Screenshot 8](autostop-ec2-logs.png/Screenshot%202026-10-12%20225302.png)
 This screenshot shows the `AutoStopEC2` Lambda execution logs and stop requests for eligible EC2 instances based on low CPU utilization.
 
 ![AutoStopEC2 CloudWatch Lambda Execution Logs](autostop-ec2-logs.png/Screenshot%202026-10-12%20224611.png)
