@@ -76,7 +76,6 @@ The AWS Automated Cost Optimizer uses scheduled serverless automation to identif
 - Stopping an instance can interrupt workloads. Use `AutoStop=true` only for instances that are safe to stop.
 - Confirm the CPU metric lookback window, period, and datapoint requirements in the actual Lambda code.
 - Actual behavior depends on the deployed code, IAM permissions, and AWS configuration.
-- ## CloudWatch Lambda Execution Logs
 ## 📸 Project Screenshots
 
 ### 1. Screenshot 1
