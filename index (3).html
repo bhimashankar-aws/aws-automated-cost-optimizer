@@ -1,0 +1,364 @@
+
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>AWS Automated Cost Optimizer</title>
+<style>
+:root {
+  --bg:#08111f;
+  --panel:#111e30;
+  --panel2:#15253a;
+  --border:#243750;
+  --text:#edf4ff;
+  --muted:#96a8c0;
+  --blue:#5b9cff;
+  --green:#2dd4a0;
+  --red:#ff6b78;
+  --orange:#ffbd69;
+}
+* { box-sizing:border-box; }
+body {
+  margin:0;
+  font-family:Inter,"Segoe UI",Arial,sans-serif;
+  color:var(--text);
+  background:radial-gradient(ellipse at top right,#172b48 0%,var(--bg) 48%);
+  min-height:100vh;
+}
+button { font:inherit; cursor:pointer; }
+.topbar {
+  display:flex; justify-content:space-between; align-items:center;
+  gap:16px; flex-wrap:wrap;
+  padding:20px 5%; border-bottom:1px solid var(--border);
+  background:#091423eF;
+}
+.brand { display:flex; align-items:center; gap:13px; }
+.logo {
+  width:45px;height:45px;border-radius:13px;
+  display:grid;place-items:center;font-size:22px;font-weight:800;
+  color:#071323;background:linear-gradient(135deg,#ffbd69,#ff8f50);
+}
+.brand h1 { margin:0;font-size:18px;letter-spacing:.2px; }
+.brand p { margin:5px 0 0;color:var(--muted);font-size:12px; }
+.live {
+  display:flex;align-items:center;gap:8px;
+  padding:9px 13px;border:1px solid #24664f;border-radius:30px;
+  color:var(--green);background:#103328;font-size:12px;font-weight:700;
+}
+.dot { width:7px;height:7px;border-radius:50%;background:var(--green); }
+main { max-width:1450px;margin:auto;padding:32px 5% 50px; }
+.hero {
+  display:flex;justify-content:space-between;align-items:center;
+  gap:20px;flex-wrap:wrap;margin-bottom:28px;
+}
+.eyebrow { color:var(--blue);font-size:11px;font-weight:800;letter-spacing:2px;text-transform:uppercase; }
+h2 { font-size:clamp(25px,3vw,35px);margin:9px 0;letter-spacing:-.8px; }
+.subtitle { color:var(--muted);font-size:14px;line-height:1.7;margin:0; }
+.primary {
+  border:0;border-radius:10px;padding:12px 17px;
+  background:linear-gradient(135deg,#69a7ff,#3979ec);
+  color:white;font-weight:700;box-shadow:0 5px 20px #3679e733;
+}
+.primary:disabled,.action:disabled { opacity:.5;cursor:wait; }
+.metrics {
+  display:grid;grid-template-columns:repeat(4,minmax(0,1fr));
+  gap:16px;margin-bottom:26px;
+}
+.metric {
+  padding:21px;border:1px solid var(--border);border-radius:16px;
+  background:linear-gradient(145deg,#15253a,#0e1a2a);
+  min-width:0;transition:transform .2s,border-color .2s;
+}
+.metric:hover { transform:translateY(-3px);border-color:#42648d; }
+.metric-head { display:flex;justify-content:space-between;align-items:center;gap:8px; }
+.metric-label { color:var(--muted);font-size:12px;font-weight:600; }
+.metric-icon {
+  width:37px;height:37px;display:grid;place-items:center;
+  background:#25436a;border-radius:11px;color:#9bc5ff;font-size:17px;
+}
+.metric-number { font-size:33px;font-weight:750;margin:19px 0 7px; }
+.metric-foot { font-size:11px;color:var(--muted); }
+.metric-foot span { color:var(--green); }
+.content {
+  border:1px solid var(--border);border-radius:17px;overflow:hidden;
+  background:#0e1a2a;
+}
+.section-head {
+  padding:21px 23px;display:flex;align-items:center;
+  justify-content:space-between;gap:15px;flex-wrap:wrap;
+  border-bottom:1px solid var(--border);
+}
+.section-head h3 { margin:0;font-size:16px; }
+.section-head p { margin:6px 0 0;color:var(--muted);font-size:12px; }
+.pill {
+  border:1px solid var(--border);border-radius:30px;padding:8px 11px;
+  color:var(--muted);font-size:11px;
+}
+.table-wrap { overflow-x:auto; }
+table { width:100%;border-collapse:collapse;min-width:740px; }
+th {
+  text-align:left;padding:15px 22px;background:#111f32;
+  color:#91a5c0;font-size:10px;letter-spacing:1px;text-transform:uppercase;
+}
+td { padding:17px 22px;border-top:1px solid #1e3046;font-size:12px; }
+tbody tr:hover { background:#14243a; }
+.instance-name { font-weight:700;font-size:13px; }
+.instance-id { color:var(--muted);font-size:10px;margin-top:5px; }
+.status {
+  display:inline-flex;align-items:center;gap:7px;
+  border-radius:30px;padding:7px 10px;font-size:11px;font-weight:700;
+}
+.status.running { background:#10392f;color:var(--green); }
+.status.stopped { background:#38212a;color:#ff9ba4; }
+.status.other { background:#3b3020;color:var(--orange); }
+.status .dot { background:currentColor; }
+.tag {
+  display:inline-block;border-radius:6px;padding:6px 8px;
+  font-size:10px;font-weight:700;
+}
+.tag.yes { background:#12382f;color:var(--green); }
+.tag.no { background:#2b3442;color:#afbdd0; }
+.actions { display:flex;gap:7px; }
+.action {
+  padding:8px 11px;border:1px solid var(--border);
+  border-radius:8px;background:#172940;color:#dbe9ff;font-size:11px;font-weight:700;
+}
+.action.start { color:var(--green);border-color:#23624e; }
+.action.stop { color:#ff9ba4;border-color:#63333c; }
+.action:hover { filter:brightness(1.25); }
+.notice {
+  display:none;margin:18px 22px;padding:12px 14px;border-radius:9px;
+  font-size:12px;line-height:1.6;white-space:pre-wrap;
+}
+.notice.show { display:block; }
+.notice.success { background:#10372d;color:#8ef0cb; }
+.notice.error { background:#3c2029;color:#ffabb3; }
+.notice.info { background:#152c48;color:#b9d7ff; }
+.loading { text-align:center;padding:38px;color:var(--muted); }
+.footer {
+  display:flex;justify-content:space-between;gap:12px;flex-wrap:wrap;
+  padding:22px 3px;color:var(--muted);font-size:11px;
+}
+.footer strong { color:#c2d5ee; }
+@media(max-width:950px) { .metrics { grid-template-columns:repeat(2,minmax(0,1fr)); } }
+@media(max-width:520px) {
+  main { padding:25px 4% 35px; }
+  .metrics { gap:10px; }
+  .metric { padding:15px; }
+  .metric-number { font-size:27px; }
+  .brand h1 { font-size:15px; }
+  .topbar { padding:15px 4%; }
+}
+</style>
+</head>
+<body>
+<header class="topbar">
+  <div class="brand">
+    <div class="logo">A</div>
+    <div>
+      <h1>AWS Automated Cost Optimizer</h1>
+      <p>EC2 MANAGEMENT &amp; CLOUD EFFICIENCY</p>
+    </div>
+  </div>
+  <div class="live"><span class="dot"></span> DASHBOARD READY</div>
+</header>
+
+<main>
+  <section class="hero">
+    <div>
+      <div class="eyebrow">Cloud Operations Center</div>
+      <h2>Manage your EC2 fleet.</h2>
+      <p class="subtitle">Monitor instance states and manage compute resources from one dashboard.</p>
+    </div>
+    <button class="primary" id="refreshBtn" onclick="loadInstances()">&#8635; &nbsp; Refresh Data</button>
+  </section>
+
+  <section class="metrics">
+    <article class="metric">
+      <div class="metric-head"><span class="metric-label">TOTAL INSTANCES</span><span class="metric-icon">▤</span></div>
+      <div class="metric-number" id="totalCount">—</div>
+      <div class="metric-foot">Instances discovered by API</div>
+    </article>
+    <article class="metric">
+      <div class="metric-head"><span class="metric-label">RUNNING</span><span class="metric-icon">↗</span></div>
+      <div class="metric-number" id="runningCount">—</div>
+      <div class="metric-foot"><span>●</span> Currently active</div>
+    </article>
+    <article class="metric">
+      <div class="metric-head"><span class="metric-label">STOPPED</span><span class="metric-icon">Ⅱ</span></div>
+      <div class="metric-number" id="stoppedCount">—</div>
+      <div class="metric-foot">Not currently running</div>
+    </article>
+    <article class="metric">
+      <div class="metric-head"><span class="metric-label">AUTOSTOP ENABLED</span><span class="metric-icon">◷</span></div>
+      <div class="metric-number" id="autoCount">—</div>
+      <div class="metric-foot">Instances tagged AutoStop=true</div>
+    </article>
+  </section>
+
+  <section class="content">
+    <div class="section-head">
+      <div>
+        <h3>EC2 Instance Management</h3>
+        <p>Review instance state and perform start or stop actions.</p>
+      </div>
+      <span class="pill" id="lastUpdated">Waiting for data…</span>
+    </div>
+    <div id="notice" class="notice"></div>
+    <div class="table-wrap">
+      <table>
+        <thead>
+          <tr><th>Instance</th><th>Current State</th><th>AutoStop</th><th>Actions</th></tr>
+        </thead>
+        <tbody id="instanceRows">
+          <tr><td colspan="4" class="loading">Connecting to AWS API…</td></tr>
+        </tbody>
+      </table>
+    </div>
+  </section>
+
+  <footer class="footer">
+    <span><strong>AWS Automated Cost Optimizer</strong> · Cloud Operations Dashboard</span>
+    <span>EC2 · Lambda · API Gateway · CloudWatch · EventBridge</span>
+  </footer>
+</main>
+
+<script>
+const INSTANCES_API = "https://ml80xjb65a.execute-api.ap-south-1.amazonaws.com/instances";
+const CONTROL_API = "https://ih3bgwso55.execute-api.ap-south-1.amazonaws.com/control";
+
+let instances = [];
+let busyInstances = new Set();
+
+function showNotice(message, type = "info") {
+  const box = document.getElementById("notice");
+  box.textContent = message;
+  box.className = "notice show " + type;
+}
+
+function hideNotice() {
+  const box = document.getElementById("notice");
+  box.textContent = "";
+  box.className = "notice";
+}
+
+function safeText(value) {
+  return String(value ?? "").replace(/[&<>"']/g, char => ({
+    "&":"&amp;", "<":"&lt;", ">":"&gt;", '"':"&quot;", "'":"&#39;"
+  })[char]);
+}
+
+function stateClass(state) {
+  if (state === "running") return "running";
+  if (state === "stopped") return "stopped";
+  return "other";
+}
+
+function renderInstances() {
+  document.getElementById("totalCount").textContent = instances.length;
+  document.getElementById("runningCount").textContent =
+    instances.filter(i => String(i.state).toLowerCase() === "running").length;
+  document.getElementById("stoppedCount").textContent =
+    instances.filter(i => String(i.state).toLowerCase() === "stopped").length;
+  document.getElementById("autoCount").textContent =
+    instances.filter(i => String(i.auto_stop).toLowerCase() === "true").length;
+
+  const tbody = document.getElementById("instanceRows");
+  if (!instances.length) {
+    tbody.innerHTML = '<tr><td colspan="4" class="loading">No EC2 instances were returned by the API.</td></tr>';
+    return;
+  }
+
+  tbody.innerHTML = instances.map(instance => {
+    const id = safeText(instance.instance_id);
+    const name = safeText(instance.name || "Unnamed instance");
+    const state = String(instance.state || "unknown").toLowerCase();
+    const auto = String(instance.auto_stop).toLowerCase() === "true";
+    const busy = busyInstances.has(instance.instance_id);
+    const canStart = state === "stopped" || state === "stopping";
+    const canStop = state === "running" || state === "pending";
+
+    return `<tr>
+      <td><div class="instance-name">${name}</div><div class="instance-id">${id}</div></td>
+      <td><span class="status ${stateClass(state)}"><span class="dot"></span>${safeText(state.toUpperCase())}</span></td>
+      <td><span class="tag ${auto ? "yes" : "no"}">${auto ? "ENABLED" : "DISABLED"}</span></td>
+      <td><div class="actions">
+        <button class="action start" ${(!canStart || busy) ? "disabled" : ""} onclick="controlInstance('${id}','start')">${busy ? "Working…" : "Start"}</button>
+        <button class="action stop" ${(!canStop || busy) ? "disabled" : ""} onclick="controlInstance('${id}','stop')">Stop</button>
+      </div></td>
+    </tr>`;
+  }).join("");
+}
+
+async function loadInstances() {
+  const button = document.getElementById("refreshBtn");
+  button.disabled = true;
+  button.textContent = "Loading…";
+  try {
+    const response = await fetch(INSTANCES_API, { method: "GET" });
+    if (!response.ok) throw new Error("API returned HTTP " + response.status);
+    const data = await response.json();
+    if (!Array.isArray(data)) throw new Error("Unexpected API response format");
+    instances = data;
+    renderInstances();
+    document.getElementById("lastUpdated").textContent =
+      "Updated " + new Date().toLocaleTimeString();
+  } catch (error) {
+    showNotice("Could not load instances: " + error.message, "error");
+    document.getElementById("instanceRows").innerHTML =
+      '<tr><td colspan="4" class="loading">Unable to load instance data. Check API configuration and CORS.</td></tr>';
+  } finally {
+    button.disabled = false;
+    button.innerHTML = "&#8635; &nbsp; Refresh Data";
+  }
+}
+
+async function controlInstance(instanceId, action) {
+  if (busyInstances.has(instanceId)) return;
+  const instance = instances.find(i => i.instance_id === instanceId);
+  if (!instance) {
+    showNotice("Instance was not found in the current dashboard data.", "error");
+    return;
+  }
+
+  const name = instance.name || instanceId;
+  const message = action === "stop"
+    ? `Stop EC2 instance "${name}" (${instanceId})?`
+    : `Start EC2 instance "${name}" (${instanceId})?`;
+
+  if (!window.confirm(message)) return;
+
+  busyInstances.add(instanceId);
+  renderInstances();
+  showNotice(`${action === "start" ? "Starting" : "Stopping"} ${name}…`, "info");
+
+  try {
+    const response = await fetch(CONTROL_API, {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({ instance_id: instanceId, action: action })
+    });
+    const raw = await response.text();
+    let result;
+    try { result = JSON.parse(raw); } catch { result = { message: raw }; }
+
+    if (!response.ok) {
+      throw new Error(result.message || result.error || "API returned HTTP " + response.status);
+    }
+
+    showNotice(result.message || `Request to ${action} ${name} was accepted. Refreshing status…`, "success");
+    await new Promise(resolve => setTimeout(resolve, 1500));
+    await loadInstances();
+  } catch (error) {
+    showNotice(`Could not ${action} ${instanceId}: ${error.message}`, "error");
+  } finally {
+    busyInstances.delete(instanceId);
+    renderInstances();
+  }
+}
+
+loadInstances();
+</script>
+</body>
+</html>
